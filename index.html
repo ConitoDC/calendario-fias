@@ -16,7 +16,7 @@
             --color-borde: #e0e0e0;
             --color-domingo: #ffebee;
             --color-hoy: #e3f2fd;
-            --color-evento-multidias: #fff3e0;
+            --color-evento-multidias: #e8f5e9;
         }
 
         [data-tema="oscuro"] {
@@ -28,7 +28,7 @@
             --color-borde: #444;
             --color-domingo: #4a1c1c;
             --color-hoy: #1a237e;
-            --color-evento-multidias: #5d4037;
+            --color-evento-multidias: #1b5e20;
         }
 
         * {
@@ -65,6 +65,7 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
             padding: 1.5rem;
             margin-bottom: 2.5rem;
+            position: relative;
         }
 
         .mes-titulo {
@@ -79,6 +80,7 @@
             display: grid;
             grid-template-columns: repeat(7, 1fr);
             gap: 8px;
+            position: relative;
         }
 
         .dia-cabecera {
@@ -98,6 +100,7 @@
             background-color: var(--color-tarjeta);
             position: relative;
             transition: transform 0.2s;
+            z-index: 1;
         }
 
         .dia:hover {
@@ -144,6 +147,8 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            position: relative;
+            z-index: 2;
         }
 
         .actividad:hover {
@@ -157,33 +162,16 @@
 
         .evento-multidias {
             background-color: var(--color-evento-multidias);
-            border: 1px dashed var(--color-primario);
+            border-left: 3px solid var(--color-primario);
         }
 
-        .evento-inicio {
-            border-top-left-radius: 12px;
-            border-bottom-left-radius: 12px;
-            margin-right: -4px;
-            border-right: none;
-        }
-
-        .evento-medio {
-            border-radius: 0;
-            margin-right: -4px;
-            margin-left: -4px;
-            border-right: none;
-            border-left: none;
-        }
-
-        .evento-fin {
-            border-top-right-radius: 12px;
-            border-bottom-right-radius: 12px;
-            margin-left: -4px;
-            border-left: none;
-        }
-
-        .evento-unico {
-            border-radius: 12px;
+        .evento-multidias-marcador {
+            position: absolute;
+            background-color: var(--color-primario);
+            height: 4px;
+            z-index: 0;
+            opacity: 0.7;
+            pointer-events: none;
         }
 
         .modal-content {
@@ -318,6 +306,17 @@
             color: #666;
             font-style: italic;
         }
+        
+        .indicador-multidia {
+            position: absolute;
+            bottom: 2px;
+            left: 2px;
+            right: 2px;
+            height: 3px;
+            background-color: var(--color-primario);
+            border-radius: 2px;
+            opacity: 0.7;
+        }
     </style>
 </head>
 <body>
@@ -336,7 +335,8 @@
         <div class="instrucciones">
             <h3><i class="fas fa-info-circle me-2"></i>Instrucciones</h3>
             <p class="mb-1">• Haz clic en cualquier actividad para ver los detalles</p>
-            <p class="mb-1">• Los eventos de varios días se muestran con diseño continuo entre fechas</p>
+            <p class="mb-1">• Los eventos de varios días se muestran con fondo verde claro y línea lateral</p>
+            <p class="mb-1">• Una línea conecta visualmente los días de eventos prolongados</p>
             <p class="mb-1">• Usa los botones de abajo para filtrar por mes</p>
             <p class="mb-0">• Activa el modo oscuro para una visualización nocturna</p>
         </div>
@@ -611,6 +611,7 @@
             const contenedor = document.getElementById('contenedor-meses');
             contenedor.innerHTML = '';
             
+            // Primero crear todos los meses y días
             mesesNumeros.forEach(mesNum => {
                 const mesDiv = document.createElement('div');
                 mesDiv.className = 'mes-container';
@@ -660,6 +661,7 @@
                     const dia = new Date(año, mesNum - 1, i);
                     const diaDiv = document.createElement('div');
                     diaDiv.className = 'dia';
+                    diaDiv.id = `dia-${año}-${mesNum}-${i}`;
                     
                     // Marcar domingos
                     if (dia.getDay() === 0) {
@@ -692,30 +694,26 @@
                         badge.className = 'badge-evento';
                         badge.title = `${actividadesDia.length} evento(s)`;
                         diaNumero.appendChild(badge);
+                        
+                        // Marcar como día de evento multidía
+                        actividadesDia.forEach(actividad => {
+                            const fechaInicio = new Date(actividad.fecha);
+                            const fechaFin = actividad.fechaFin ? new Date(actividad.fechaFin) : new Date(actividad.fecha);
+                            
+                            if (fechaInicio.getTime() !== fechaFin.getTime()) {
+                                diaDiv.classList.add('evento-multidias');
+                                
+                                // Añadir indicador visual en la parte inferior
+                                const indicador = document.createElement('div');
+                                indicador.className = 'indicador-multidia';
+                                diaDiv.appendChild(indicador);
+                            }
+                        });
                     }
                     
                     actividadesDia.forEach(actividad => {
-                        const fechaInicio = new Date(actividad.fecha);
-                        const fechaFin = actividad.fechaFin ? new Date(actividad.fechaFin) : new Date(actividad.fecha);
-                        const fechaActual = new Date(fechaStr);
-                        
-                        let claseExtra = 'evento-unico';
-                        
-                        // Determinar si es evento de múltiples días
-                        if (fechaInicio.getTime() !== fechaFin.getTime()) {
-                            diaDiv.classList.add('evento-multidias');
-                            
-                            if (fechaActual.getTime() === fechaInicio.getTime()) {
-                                claseExtra = 'evento-inicio';
-                            } else if (fechaActual.getTime() === fechaFin.getTime()) {
-                                claseExtra = 'evento-fin';
-                            } else {
-                                claseExtra = 'evento-medio';
-                            }
-                        }
-                        
                         const actDiv = document.createElement('div');
-                        actDiv.className = `actividad ${claseExtra}`;
+                        actDiv.className = 'actividad';
                         actDiv.title = actividad.titulo;
                         actDiv.textContent = actividad.titulo;
                         actDiv.addEventListener('click', () => mostrarDetallesActividad(actividad));
@@ -729,10 +727,72 @@
                 contenedor.appendChild(mesDiv);
             });
             
+            // Ahora crear los conectores para eventos multidía
+            crearConectoresEventosMultidia();
+            
             // Desplazar hacia el primer mes mostrado
             if (mesesNumeros.length === 1) {
                 document.getElementById(`mes-${mesesNumeros[0]}`).scrollIntoView({ behavior: 'smooth' });
             }
+        }
+
+        // Función para crear conectores visuales entre días de eventos multidía
+        function crearConectoresEventosMultidia() {
+            actividades.forEach(actividad => {
+                if (actividad.fechaFin && actividad.fechaFin !== actividad.fecha) {
+                    const fechaInicio = new Date(actividad.fecha);
+                    const fechaFin = new Date(actividad.fechaFin);
+                    
+                    // Solo si el evento abarca múltiples días
+                    if (fechaInicio.getTime() !== fechaFin.getTime()) {
+                        const mesInicio = fechaInicio.getMonth() + 1;
+                        const mesFin = fechaFin.getMonth() + 1;
+                        
+                        // Para cada mes que abarque el evento
+                        for (let mes = mesInicio; mes <= mesFin; mes++) {
+                            const primerDiaMes = new Date(2025, mes - 1, 1);
+                            const ultimoDiaMes = new Date(2025, mes, 0);
+                            
+                            const inicio = mes === mesInicio ? fechaInicio.getDate() : 1;
+                            const fin = mes === mesFin ? fechaFin.getDate() : ultimoDiaMes.getDate();
+                            
+                            // Para cada día del evento en este mes
+                            for (let dia = inicio; dia <= fin; dia++) {
+                                const elementoDia = document.getElementById(`dia-2025-${mes}-${dia}`);
+                                if (elementoDia) {
+                                    // Ya marcamos el día con evento-multidias en la función anterior
+                                    // Aquí podríamos añadir lógica adicional si es necesario
+                                }
+                            }
+                            
+                            // Crear conectores visuales entre días consecutivos
+                            if (inicio < fin) {
+                                for (let dia = inicio; dia < fin; dia++) {
+                                    const diaActual = document.getElementById(`dia-2025-${mes}-${dia}`);
+                                    const diaSiguiente = document.getElementById(`dia-2025-${mes}-${dia+1}`);
+                                    
+                                    if (diaActual && diaSiguiente) {
+                                        // Verificar si están en la misma fila (días consecutivos)
+                                        const rectActual = diaActual.getBoundingClientRect();
+                                        const rectSiguiente = diaSiguiente.getBoundingClientRect();
+                                        
+                                        if (Math.abs(rectSiguiente.top - rectActual.top) < 5) { // Están en la misma fila
+                                            const contenedor = diaActual.closest('.mes-container');
+                                            const conector = document.createElement('div');
+                                            conector.className = 'evento-multidias-marcador';
+                                            conector.style.top = (rectActual.top + rectActual.height - 2) + 'px';
+                                            conector.style.left = (rectActual.right - 4) + 'px';
+                                            conector.style.width = (rectSiguiente.left - rectActual.right + 8) + 'px';
+                                            
+                                            contenedor.appendChild(conector);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            });
         }
 
         // Función para mostrar detalles de actividad en modal
