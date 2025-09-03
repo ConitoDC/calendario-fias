@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendario con Eventos de Múltiples Días</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --color-primario: #4e54c8;
+            --color-secundario: #8f94fb;
+            --color-texto: #333;
+            --color-fondo: #f9f9f9;
+            --color-tarjeta: #ffffff;
+            --color-borde: #e0e0e0;
+            --color-domingo: #ffebee;
+            --color-hoy: #e3f2fd;
+            --color-evento-multidias: #fff3e0;
+        }
+
+        [data-tema="oscuro"] {
+            --color-primario: #6b73ff;
+            --color-secundario: #000dff;
+            --color-texto: #f0f0f0;
+            --color-fondo: #121212;
+            --color-tarjeta: #1e1e1e;
+            --color-borde: #444;
+            --color-domingo: #4a1c1c;
+            --color-hoy: #1a237e;
+            --color-evento-multidias: #5d4037;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body {
+            background-color: var(--color-fondo);
+            color: var(--color-texto);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            padding-bottom: 2rem;
+        }
+
+        .container {
+            max-width: 1400px;
+        }
+
+        header {
+            background: linear-gradient(to right, var(--color-primario), var(--color-secundario));
+            color: white;
+            padding: 2rem 0;
+            border-radius: 0 0 15px 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .mes-container {
+            background-color: var(--color-tarjeta);
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            padding: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .mes-titulo {
+            color: var(--color-primario);
+            text-align: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--color-secundario);
+        }
+
+        .calendario {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+
+        .dia-cabecera {
+            text-align: center;
+            font-weight: bold;
+            padding: 0.5rem;
+            background-color: var(--color-secundario);
+            color: white;
+            border-radius: 5px;
+        }
+
+        .dia {
+            min-height: 120px;
+            border: 1px solid var(--color-borde);
+            border-radius: 6px;
+            padding: 8px;
+            background-color: var(--color-tarjeta);
+            position: relative;
+            transition: transform 0.2s;
+        }
+
+        .dia:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .dia-numero {
+            font-weight: bold;
+            margin-bottom: 5px;
+            padding-bottom: 5px;
+            border-bottom: 1px dashed var(--color-borde);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .badge-evento {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--color-primario);
+            margin-left: 4px;
+        }
+
+        .domingo {
+            background-color: var(--color-domingo);
+        }
+
+        .hoy {
+            background-color: var(--color-hoy);
+            border: 2px solid var(--color-primario);
+        }
+
+        .actividad {
+            font-size: 0.75rem;
+            padding: 4px;
+            margin-bottom: 4px;
+            border-radius: 3px;
+            background: linear-gradient(to right, var(--color-primario), var(--color-secundario));
+            color: white;
+            cursor: pointer;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .actividad:hover {
+            opacity: 0.9;
+        }
+
+        .vacio {
+            background-color: rgba(200, 200, 200, 0.2);
+            border: 1px dashed var(--color-borde);
+        }
+
+        .evento-multidias {
+            background-color: var(--color-evento-multidias);
+            border: 1px dashed var(--color-primario);
+        }
+
+        .evento-inicio {
+            border-top-left-radius: 12px;
+            border-bottom-left-radius: 12px;
+            margin-right: -4px;
+            border-right: none;
+        }
+
+        .evento-medio {
+            border-radius: 0;
+            margin-right: -4px;
+            margin-left: -4px;
+            border-right: none;
+            border-left: none;
+        }
+
+        .evento-fin {
+            border-top-right-radius: 12px;
+            border-bottom-right-radius: 12px;
+            margin-left: -4px;
+            border-left: none;
+        }
+
+        .evento-unico {
+            border-radius: 12px;
+        }
+
+        .modal-content {
+            background-color: var(--color-tarjeta);
+            color: var(--color-texto);
+        }
+
+        .modal-header {
+            border-bottom: 1px solid var(--color-borde);
+        }
+
+        .modal-footer {
+            border-top: 1px solid var(--color-borde);
+        }
+
+        .navegacion-meses {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .btn-mes {
+            background: transparent;
+            border: 2px solid var(--color-primario);
+            color: var(--color-primario);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+
+        .btn-mes:hover, .btn-mes.active {
+            background: var(--color-primario);
+            color: white;
+        }
+
+        .btn-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--color-primario);
+            color: white;
+            border: none;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            background-color: var(--color-tarjeta);
+            border-top: 1px solid var(--color-borde);
+        }
+
+        .instrucciones {
+            background-color: var(--color-tarjeta);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        .personalizador {
+            background-color: var(--color-tarjeta);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        .colores-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .color-selector {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .color-selector input {
+            width: 100%;
+            height: 40px;
+            border: 1px solid var(--color-borde);
+            border-radius: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .dia {
+                min-height: 100px;
+                font-size: 0.85rem;
+            }
+            
+            .actividad {
+                font-size: 0.7rem;
+                padding: 2px;
+            }
+
+            .colores-container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .categoria-badge {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            margin-right: 0.3rem;
+            background: var(--color-secundario);
+            color: white;
+        }
+
+        .modal-body a {
+            color: var(--color-primario);
+            text-decoration: underline;
+        }
+
+        .rango-fechas {
+            font-size: 0.9em;
+            color: #666;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container text-center">
+            <h1 class="display-5"><i class="fas fa-calendar-alt me-2"></i>Calendario con Eventos de Múltiples Días</h1>
+            <p class="lead">Septiembre - Diciembre 2025</p>
+            <div class="form-check form-switch d-inline-block">
+                <input class="form-check-input" type="checkbox" id="modoOscuro">
+                <label class="form-check-label" for="modoOscuro">Modo oscuro</label>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="instrucciones">
+            <h3><i class="fas fa-info-circle me-2"></i>Instrucciones</h3>
+            <p class="mb-1">• Haz clic en cualquier actividad para ver los detalles</p>
+            <p class="mb-1">• Los eventos de varios días se muestran con diseño continuo entre fechas</p>
+            <p class="mb-1">• Usa los botones de abajo para filtrar por mes</p>
+            <p class="mb-0">• Activa el modo oscuro para una visualización nocturna</p>
+        </div>
+
+        <div class="personalizador">
+            <h3><i class="fas fa-palette me-2"></i>Personalizar Colores</h3>
+            <div class="colores-container">
+                <div class="color-selector">
+                    <label>Color Primario</label>
+                    <input type="color" id="colorPrimario" value="#4e54c8">
+                </div>
+                <div class="color-selector">
+                    <label>Color Secundario</label>
+                    <input type="color" id="colorSecundario" value="#8f94fb">
+                </div>
+                <div class="color-selector">
+                    <label>Color de Texto</label>
+                    <input type="color" id="colorTexto" value="#333333">
+                </div>
+                <div class="color-selector">
+                    <label>Color de Fondo</label>
+                    <input type="color" id="colorFondo" value="#f9f9f9">
+                </div>
+            </div>
+            <button class="btn btn-sm btn-secondary mt-3" id="resetColores">
+                <i class="fas fa-undo me-1"></i>Restablecer colores
+            </button>
+        </div>
+
+        <div class="navegacion-meses" id="navegacion-meses">
+            <!-- Los botones de meses se generarán con JavaScript -->
+        </div>
+
+        <div id="contenedor-meses">
+            <!-- Los meses se generarán con JavaScript -->
+        </div>
+    </div>
+
+    <!-- Modal para detalles de actividad -->
+    <div class="modal fade" id="modalActividad" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitulo"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Fechas:</strong> <span id="modalFecha"></span></p>
+                    <p><strong>Ubicación:</strong> <span id="modalUbicacion"></span></p>
+                    <p><strong>Descripción:</strong> <span id="modalDescripcion"></span></p>
+                    <p><strong>Categoría:</strong> <span id="modalCategoria"></span></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn-top" id="btnScrollTop">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <footer>
+        <p>Calendario actualizado el: <span id="fecha-actualizacion"></span></p>
+        <p>© 2025 - Todos los derechos reservados</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Datos de ejemplo para el último trimestre de 2025
+        const actividades = [
+            { 
+                id: 1, 
+                fecha: "2025-09-15", 
+                fechaFin: "2025-09-17",
+                titulo: "Feria de Arte Local", 
+                descripcion: 'Exposición de artistas locales en el centro cultural. <a href="https://ejemplo.com/feria-arte" target="_blank">Más información</a>', 
+                categoria: "cultura",
+                ubicacion: "Centro Cultural Municipal"
+            },
+            { 
+                id: 2, 
+                fecha: "2025-09-22", 
+                titulo: "Maratón Ciudad", 
+                descripcion: 'Carrera de 10k por el centro de la ciudad. <a href="https://ejemplo.com/maraton" target="_blank">Inscripciones aquí</a>', 
+                categoria: "deportes",
+                ubicacion: "Parque Central"
+            },
+            { 
+                id: 3, 
+                fecha: "2025-10-05", 
+                fechaFin: "2025-10-07",
+                titulo: "Taller de Fotografía", 
+                descripcion: "Aprende técnicas profesionales de fotografía con nuestro instructor certificado.", 
+                categoria: "educación",
+                ubicacion: "Aula Magna, Universidad"
+            },
+            { 
+                id: 4, 
+                fecha: "2025-10-12", 
+                titulo: "Concierto de Otoño", 
+                descripcion: 'Disfruta de la banda local en el anfiteatro. <a href="https://ejemplo.com/concierto" target="_blank">Compra entradas</a>', 
+                categoria: "cultura",
+                ubicacion: "Anfiteatro Municipal"
+            },
+            { 
+                id: 5, 
+                fecha: "2025-10-20", 
+                fechaFin: "2025-10-22",
+                titulo: "Feria de Empleo", 
+                descripcion: "Conecta con empresas locales y encuentra oportunidades laborales. Trae tu CV.", 
+                categoria: "social",
+                ubicacion: "Centro de Convenciones"
+            },
+            { 
+                id: 6, 
+                fecha: "2025-11-03", 
+                titulo: "Torneo de Voleibol", 
+                descripcion: "Competencia abierta para todos los niveles. Premios para los primeros lugares.", 
+                categoria: "deportes",
+                ubicacion: "Polideportivo Municipal"
+            },
+            { 
+                id: 7, 
+                fecha: "2025-11-10", 
+                fechaFin: "2025-11-12",
+                titulo: "Charla sobre Sostenibilidad", 
+                descripcion: 'Aprende cómo vivir de manera más sostenible. <a href="https://ejemplo.com/sostenibilidad" target="_blank">Recursos adicionales</a>', 
+                categoria: "educación",
+                ubicacion: "Biblioteca Central"
+            },
+            { 
+                id: 8, 
+                fecha: "2025-11-15", 
+                fechaFin: "2025-11-20",
+                titulo: "Mercado Navideño", 
+                descripcion: "Productos artesanales y comida para las fiestas. Ideal para compras navideñas.", 
+                categoria: "social",
+                ubicacion: "Plaza Principal"
+            },
+            { 
+                id: 9, 
+                fecha: "2025-12-01", 
+                titulo: "Encendido de Luces Navideñas", 
+                descripcion: "Celebración con música y espectáculos para el encendido del alumbrado navideño.", 
+                categoria: "cultura",
+                ubicacion: "Plaza Mayor"
+            },
+            { 
+                id: 10, 
+                fecha: "2025-12-10", 
+                fechaFin: "2025-12-15",
+                titulo: "Feria del Libro", 
+                descripcion: 'Los mejores autores locales presentarán sus obras. <a href="https://ejemplo.com/feria-libro" target="_blank">Programación completa</a>', 
+                categoria: "cultura",
+                ubicacion: "Centro Cultural"
+            },
+            { 
+                id: 11, 
+                fecha: "2025-12-20", 
+                titulo: "Concierto de Navidad", 
+                descripcion: "La Orquesta Sinfónica interpretará villancicos y música navideña.", 
+                categoria: "cultura",
+                ubicacion: "Teatro Municipal"
+            },
+            { 
+                id: 12, 
+                fecha: "2025-12-28", 
+                fechaFin: "2025-12-31",
+                titulo: "Fiesta de Fin de Año", 
+                descripcion: 'Celebración con música en vivo, comida y fuegos artificiales. <a href="https://ejemplo.com/año-nuevo" target="_blank">Más detalles</a>', 
+                categoria: "social",
+                ubicacion: "Plaza Central"
+            }
+        ];
+
+        // Esperar a que el DOM esté completamente cargado
+        document.addEventListener('DOMContentLoaded', function() {
+            // Configurar la fecha de actualización
+            document.getElementById('fecha-actualizacion').textContent = new Date().toLocaleDateString('es-ES', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            // Inicializar el calendario
+            inicializarCalendario();
+            
+            // Configurar el modo oscuro
+            configurarModoOscuro();
+            
+            // Configurar el botón de scroll to top
+            configurarScrollTop();
+            
+            // Configurar selectores de color
+            configurarSelectoresColor();
+        });
+
+        // Función para formatear fechas
+        function formatearFecha(fechaStr) {
+            const fecha = new Date(fechaStr);
+            return fecha.toLocaleDateString('es-ES', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        // Función para formatear rango de fechas
+        function formatearRangoFechas(inicioStr, finStr) {
+            const inicio = new Date(inicioStr);
+            const fin = new Date(finStr);
+            
+            if (inicio.getMonth() === fin.getMonth()) {
+                return `Del ${inicio.getDate()} al ${fin.getDate()} de ${inicio.toLocaleDateString('es-ES', { month: 'long' })}`;
+            } else {
+                return `Del ${inicio.getDate()} de ${inicio.toLocaleDateString('es-ES', { month: 'long' })} al ${fin.getDate()} de ${fin.toLocaleDateString('es-ES', { month: 'long' })}`;
+            }
+        }
+
+        // Función para inicializar el calendario
+        function inicializarCalendario() {
+            // Crear navegación entre meses
+            crearNavegacionMeses();
+            
+            // Mostrar todos los meses al cargar
+            mostrarMeses([9, 10, 11, 12]);
+        }
+
+        // Función para crear la navegación entre meses
+        function crearNavegacionMeses() {
+            const navegacion = document.getElementById('navegacion-meses');
+            const meses = [
+                { num: 9, nombre: 'Septiembre' },
+                { num: 10, nombre: 'Octubre' },
+                { num: 11, nombre: 'Noviembre' },
+                { num: 12, nombre: 'Diciembre' }
+            ];
+            
+            // Botón para mostrar todos los meses
+            const btnTodos = document.createElement('button');
+            btnTodos.className = 'btn-mes active';
+            btnTodos.textContent = 'Todos';
+            btnTodos.dataset.mes = 'todos';
+            btnTodos.addEventListener('click', function() {
+                document.querySelectorAll('.btn-mes').forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                mostrarMeses([9, 10, 11, 12]);
+            });
+            navegacion.appendChild(btnTodos);
+            
+            // Botones para cada mes individual
+            meses.forEach(mes => {
+                const boton = document.createElement('button');
+                boton.className = 'btn-mes';
+                boton.textContent = mes.nombre;
+                boton.dataset.mes = mes.num;
+                boton.addEventListener('click', function() {
+                    document.querySelectorAll('.btn-mes').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    mostrarMeses([mes.num]);
+                });
+                navegacion.appendChild(boton);
+            });
+        }
+
+        // Función para mostrar meses específicos
+        function mostrarMeses(mesesNumeros) {
+            const contenedor = document.getElementById('contenedor-meses');
+            contenedor.innerHTML = '';
+            
+            mesesNumeros.forEach(mesNum => {
+                const mesDiv = document.createElement('div');
+                mesDiv.className = 'mes-container';
+                mesDiv.id = `mes-${mesNum}`;
+                
+                const año = 2025;
+                const nombreMes = new Date(año, mesNum - 1, 1).toLocaleDateString('es-ES', { month: 'long' });
+                const titulo = document.createElement('h2');
+                titulo.className = 'mes-titulo';
+                titulo.textContent = `${nombreMes.charAt(0).toUpperCase() + nombreMes.slice(1)} ${año}`;
+                mesDiv.appendChild(titulo);
+                
+                // Crear el calendario para este mes
+                const calendarioDiv = document.createElement('div');
+                calendarioDiv.className = 'calendario';
+                
+                // Añadir cabeceras de días
+                const diasSemana = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+                diasSemana.forEach(dia => {
+                    const diaHeader = document.createElement('div');
+                    diaHeader.className = 'dia-cabecera';
+                    diaHeader.textContent = dia;
+                    calendarioDiv.appendChild(diaHeader);
+                });
+                
+                // Obtener el primer día del mes y el número de días
+                const primerDia = new Date(año, mesNum - 1, 1);
+                const ultimoDia = new Date(año, mesNum, 0);
+                const numDias = ultimoDia.getDate();
+                
+                // Días vacíos al inicio
+                let diaInicio = primerDia.getDay();
+                // Ajustar para que la semana comience en lunes (0 -> lunes, 6 -> domingo)
+                diaInicio = diaInicio === 0 ? 6 : diaInicio - 1;
+                
+                for (let i = 0; i < diaInicio; i++) {
+                    const diaVacio = document.createElement('div');
+                    diaVacio.className = 'dia vacio';
+                    calendarioDiv.appendChild(diaVacio);
+                }
+                
+                // Días del mes
+                const hoy = new Date();
+                hoy.setHours(0, 0, 0, 0);
+                
+                for (let i = 1; i <= numDias; i++) {
+                    const dia = new Date(año, mesNum - 1, i);
+                    const diaDiv = document.createElement('div');
+                    diaDiv.className = 'dia';
+                    
+                    // Marcar domingos
+                    if (dia.getDay() === 0) {
+                        diaDiv.classList.add('domingo');
+                    }
+                    
+                    // Marcar el día actual
+                    if (dia.getTime() === hoy.getTime() && mesNum === hoy.getMonth() + 1 && año === hoy.getFullYear()) {
+                        diaDiv.classList.add('hoy');
+                    }
+                    
+                    const diaNumero = document.createElement('div');
+                    diaNumero.className = 'dia-numero';
+                    diaNumero.textContent = i;
+                    diaDiv.appendChild(diaNumero);
+                    
+                    // Añadir actividades para este día
+                    const fechaStr = `${año}-${mesNum.toString().padStart(2, '0')}-${i.toString().padStart(2, '0')}`;
+                    const actividadesDia = actividades.filter(a => {
+                        const fechaInicio = new Date(a.fecha);
+                        const fechaFin = a.fechaFin ? new Date(a.fechaFin) : new Date(a.fecha);
+                        const fechaActual = new Date(fechaStr);
+                        
+                        return fechaActual >= fechaInicio && fechaActual <= fechaFin;
+                    });
+                    
+                    if (actividadesDia.length > 0) {
+                        // Añadir badge indicador de eventos
+                        const badge = document.createElement('span');
+                        badge.className = 'badge-evento';
+                        badge.title = `${actividadesDia.length} evento(s)`;
+                        diaNumero.appendChild(badge);
+                    }
+                    
+                    actividadesDia.forEach(actividad => {
+                        const fechaInicio = new Date(actividad.fecha);
+                        const fechaFin = actividad.fechaFin ? new Date(actividad.fechaFin) : new Date(actividad.fecha);
+                        const fechaActual = new Date(fechaStr);
+                        
+                        let claseExtra = 'evento-unico';
+                        
+                        // Determinar si es evento de múltiples días
+                        if (fechaInicio.getTime() !== fechaFin.getTime()) {
+                            diaDiv.classList.add('evento-multidias');
+                            
+                            if (fechaActual.getTime() === fechaInicio.getTime()) {
+                                claseExtra = 'evento-inicio';
+                            } else if (fechaActual.getTime() === fechaFin.getTime()) {
+                                claseExtra = 'evento-fin';
+                            } else {
+                                claseExtra = 'evento-medio';
+                            }
+                        }
+                        
+                        const actDiv = document.createElement('div');
+                        actDiv.className = `actividad ${claseExtra}`;
+                        actDiv.title = actividad.titulo;
+                        actDiv.textContent = actividad.titulo;
+                        actDiv.addEventListener('click', () => mostrarDetallesActividad(actividad));
+                        diaDiv.appendChild(actDiv);
+                    });
+                    
+                    calendarioDiv.appendChild(diaDiv);
+                }
+                
+                mesDiv.appendChild(calendarioDiv);
+                contenedor.appendChild(mesDiv);
+            });
+            
+            // Desplazar hacia el primer mes mostrado
+            if (mesesNumeros.length === 1) {
+                document.getElementById(`mes-${mesesNumeros[0]}`).scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // Función para mostrar detalles de actividad en modal
+        function mostrarDetallesActividad(actividad) {
+            document.getElementById('modalTitulo').textContent = actividad.titulo;
+            
+            const fechaElement = document.getElementById('modalFecha');
+            if (actividad.fechaFin && actividad.fechaFin !== actividad.fecha) {
+                fechaElement.innerHTML = `<span class="rango-fechas">${formatearRangoFechas(actividad.fecha, actividad.fechaFin)}</span><br>${formatearFecha(actividad.fecha)} - ${formatearFecha(actividad.fechaFin)}`;
+            } else {
+                fechaElement.textContent = formatearFecha(actividad.fecha);
+            }
+            
+            document.getElementById('modalUbicacion').textContent = actividad.ubicacion;
+            document.getElementById('modalDescripcion').innerHTML = actividad.descripcion;
+            
+            const categoriaSpan = document.getElementById('modalCategoria');
+            categoriaSpan.textContent = '';
+            const badge = document.createElement('span');
+            badge.className = 'categoria-badge';
+            badge.textContent = actividad.categoria;
+            categoriaSpan.appendChild(badge);
+            
+            const modal = new bootstrap.Modal(document.getElementById('modalActividad'));
+            modal.show();
+        }
+
+        // Configurar el modo oscuro
+        function configurarModoOscuro() {
+            const toggleOscuro = document.getElementById('modoOscuro');
+            const body = document.body;
+            
+            // Comprobar preferencia del usuario
+            const prefiereOscuro = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            if (prefiereOscuro) {
+                body.setAttribute('data-tema', 'oscuro');
+                toggleOscuro.checked = true;
+            }
+            
+            // Alternar modo oscuro al cambiar el toggle
+            toggleOscuro.addEventListener('change', function() {
+                if (this.checked) {
+                    body.setAttribute('data-tema', 'oscuro');
+                } else {
+                    body.removeAttribute('data-tema');
+                }
+            });
+        }
+
+        // Configurar selectores de color
+        function configurarSelectoresColor() {
+            // Establecer valores iniciales
+            document.getElementById('colorPrimario').value = '#4e54c8';
+            document.getElementById('colorSecundario').value = '#8f94fb';
+            document.getElementById('colorTexto').value = '#333333';
+            document.getElementById('colorFondo').value = '#f9f9f9';
+            
+            // Añadir event listeners
+            document.getElementById('colorPrimario').addEventListener('input', function() {
+                document.documentElement.style.setProperty('--color-primario', this.value);
+            });
+            
+            document.getElementById('colorSecundario').addEventListener('input', function() {
+                document.documentElement.style.setProperty('--color-secundario', this.value);
+            });
+            
+            document.getElementById('colorTexto').addEventListener('input', function() {
+                document.documentElement.style.setProperty('--color-texto', this.value);
+            });
+            
+            document.getElementById('colorFondo').addEventListener('input', function() {
+                document.documentElement.style.setProperty('--color-fondo', this.value);
+            });
+            
+            // Botón para restablecer colores
+            document.getElementById('resetColores').addEventListener('click', function() {
+                document.documentElement.style.setProperty('--color-primario', '#4e54c8');
+                document.documentElement.style.setProperty('--color-secundario', '#8f94fb');
+                document.documentElement.style.setProperty('--color-texto', '#333');
+                document.documentElement.style.setProperty('--color-fondo', '#f9f9f9');
+                
+                document.getElementById('colorPrimario').value = '#4e54c8';
+                document.getElementById('colorSecundario').value = '#8f94fb';
+                document.getElementById('colorTexto').value = '#333333';
+                document.getElementById('colorFondo').value = '#f9f9f9';
+            });
+        }
+
+        // Configurar el botón de scroll to top
+        function configurarScrollTop() {
+            const btnScrollTop = document.getElementById('btnScrollTop');
+            
+            // Mostrar u ocultar el botón según la posición de scroll
+            window.addEventListener('scroll', function() {
+                if (window.pageYOffset > 300) {
+                    btnScrollTop.style.display = 'block';
+                } else {
+                    btnScrollTop.style.display = 'none';
+                }
+            });
+            
+            // Scroll suave al hacer clic en el botón
+            btnScrollTop.addEventListener('click', function() {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+        }
+    </script>
+</body>
+</html>
