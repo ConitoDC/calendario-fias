@@ -8,36 +8,29 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            /* Modo claro - Rojo/Burdeo como principales */
-            --color-primario: #C22533;      /* Rojo principal */
-            --color-secundario: #742345;    /* Burdeo secundario */
-            --color-terciario: #087049;     /* Verde oscuro */
-            --color-accento: #90C6BE;       /* Verde claro acento */
-            
-            --color-texto: #333333;
-            --color-fondo: #f8f5f5;         /* Fondo ligeramente cálido */
+            --color-primario: #4e54c8;
+            --color-secundario: #8f94fb;
+            --color-texto: #333;
+            --color-fondo: #f9f9f9;
             --color-tarjeta: #ffffff;
-            --color-borde: #e6d2d5;         /* Borde rojo muy suave */
-            --color-domingo: #fbe9eb;       /* Fondo domingo - rojo muy claro */
-            --color-hoy: #f3e5e6;           /* Fondo hoy - rojo claro */
-            --color-evento-multidias: #e6f0ed; /* Verde muy claro para eventos multidía */
+            --color-borde: #e0e0e0;
+            --color-domingo: #ffebee;
+            --color-hoy: #e3f2fd;
+            --color-evento-multidias: #e8f5e9;
         }
 
         [data-tema="oscuro"] {
-            /* Modo oscuro - manteniendo la misma paleta pero más oscura */
-            --color-primario: #D64D5A;      /* Rojo más brillante para contraste */
-            --color-secundario: #8C2A55;    /* Burdeo más intenso */
-            --color-terciario: #0B8A5C;     /* Verde más brillante */
-            --color-accento: #9ED6CE;       /* Verde acento más claro */
-            
-            --color-texto: #f0e6e6;
-            --color-fondo: #1a1415;         /* Fondo oscuro con tono rojizo */
-            --color-tarjeta: #251d1f;
-            --color-borde: #4a3a3d;
-            --color-domingo: #3d2629;
-            --color-hoy: #4a2d31;
-            --color-evento-multidias: #24332f;
+            --color-primario: #6b73ff;
+            --color-secundario: #000dff;
+            --color-texto: #f0f0f0;
+            --color-fondo: #121212;
+            --color-tarjeta: #1e1e1e;
+            --color-borde: #444;
+            --color-domingo: #4a1c1c;
+            --color-hoy: #1a237e;
+            --color-evento-multidias: #1b5e20;
         }
+
         * {
             margin: 0;
             padding: 0;
@@ -249,34 +242,6 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
         }
 
-        .personalizador {
-            background-color: var(--color-tarjeta);
-            border-radius: 10px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-        }
-
-        .colores-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .color-selector {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .color-selector input {
-            width: 100%;
-            height: 40px;
-            border: 1px solid var(--color-borde);
-            border-radius: 5px;
-        }
-
         @media (max-width: 768px) {
             .dia {
                 min-height: 100px;
@@ -286,10 +251,6 @@
             .actividad {
                 font-size: 0.7rem;
                 padding: 2px;
-            }
-
-            .colores-container {
-                grid-template-columns: 1fr 1fr;
             }
         }
 
@@ -346,31 +307,6 @@
             <p class="mb-1">• Una línea conecta visualmente los días de eventos prolongados</p>
             <p class="mb-1">• Usa los botones de abajo para filtrar por mes</p>
             <p class="mb-0">• Activa el modo oscuro para una visualización nocturna</p>
-        </div>
-
-        <div class="personalizador">
-            <h3><i class="fas fa-palette me-2"></i>Personalizar Colores</h3>
-            <div class="colores-container">
-                <div class="color-selector">
-                    <label>Color Primario</label>
-                    <input type="color" id="colorPrimario" value="#4e54c8">
-                </div>
-                <div class="color-selector">
-                    <label>Color Secundario</label>
-                    <input type="color" id="colorSecundario" value="#8f94fb">
-                </div>
-                <div class="color-selector">
-                    <label>Color de Texto</label>
-                    <input type="color" id="colorTexto" value="#333333">
-                </div>
-                <div class="color-selector">
-                    <label>Color de Fondo</label>
-                    <input type="color" id="colorFondo" value="#f9f9f9">
-                </div>
-            </div>
-            <button class="btn btn-sm btn-secondary mt-3" id="resetColores">
-                <i class="fas fa-undo me-1"></i>Restablecer colores
-            </button>
         </div>
 
         <div class="navegacion-meses" id="navegacion-meses">
@@ -461,7 +397,7 @@
             { 
                 id: 6, 
                 fecha: "2025-10-27", 
-                fechaFin: "2025-11-02",
+                fechaFin: "2025-11-02", // Aquí faltaba una coma
                 titulo: "Semana de Receso 2", 
                 descripcion: "Semana de receso calanderizada por Escuela.", 
                 categoria: "Actividades Escuela",
@@ -473,12 +409,12 @@
                 fechaFin: "2025-09-07",
                 titulo: "Semana Olímpica (JOE)", 
                 descripcion: 'Ven a apoyar a los deportistas de nuestra facultad! <a href="https://www.deporteazul.cl/joe/" target="_blank">Información JOEs</a>', 
-                categoria: "educación",
+                categoria: "Deportes",
                 ubicacion: "Universidad de Chile"
             },
             { 
                 id: 8, 
-                fecha: "2025-11-5", 
+                fecha: "2025-11-05", 
                 titulo: "Asamblea", 
                 descripcion: "Asamblea informativa + presentación borrador oficial estatutos CEFIAS.", 
                 categoria: "Asamblea",
@@ -520,9 +456,6 @@
             
             // Configurar el botón de scroll to top
             configurarScrollTop();
-            
-            // Configurar selectores de color
-            configurarSelectoresColor();
         });
 
         // Función para formatear fechas
@@ -828,45 +761,6 @@
                 } else {
                     body.removeAttribute('data-tema');
                 }
-            });
-        }
-
-        // Configurar selectores de color
-        function configurarSelectoresColor() {
-            // Establecer valores iniciales
-            document.getElementById('colorPrimario').value = '#4e54c8';
-            document.getElementById('colorSecundario').value = '#8f94fb';
-            document.getElementById('colorTexto').value = '#333333';
-            document.getElementById('colorFondo').value = '#f9f9f9';
-            
-            // Añadir event listeners
-            document.getElementById('colorPrimario').addEventListener('input', function() {
-                document.documentElement.style.setProperty('--color-primario', this.value);
-            });
-            
-            document.getElementById('colorSecundario').addEventListener('input', function() {
-                document.documentElement.style.setProperty('--color-secundario', this.value);
-            });
-            
-            document.getElementById('colorTexto').addEventListener('input', function() {
-                document.documentElement.style.setProperty('--color-texto', this.value);
-            });
-            
-            document.getElementById('colorFondo').addEventListener('input', function() {
-                document.documentElement.style.setProperty('--color-fondo', this.value);
-            });
-            
-            // Botón para restablecer colores
-            document.getElementById('resetColores').addEventListener('click', function() {
-                document.documentElement.style.setProperty('--color-primario', '#4e54c8');
-                document.documentElement.style.setProperty('--color-secundario', '#8f94fb');
-                document.documentElement.style.setProperty('--color-texto', '#333');
-                document.documentElement.style.setProperty('--color-fondo', '#f9f9f9');
-                
-                document.getElementById('colorPrimario').value = '#4e54c8';
-                document.getElementById('colorSecundario').value = '#8f94fb';
-                document.getElementById('colorTexto').value = '#333333';
-                document.getElementById('colorFondo').value = '#f9f9f9';
             });
         }
 
