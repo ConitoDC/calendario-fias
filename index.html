@@ -3,32 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calendario con Eventos de Múltiples Días</title>
+    <title>Calendario Actividades FIAS</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --color-primario: #4e54c8;
-            --color-secundario: #8f94fb;
-            --color-texto: #333;
-            --color-fondo: #f9f9f9;
+            /* Modo claro - Rojo/Burdeo como principales */
+            --color-primario: #C22533;      /* Rojo principal */
+            --color-secundario: #742345;    /* Burdeo secundario */
+            --color-terciario: #087049;     /* Verde oscuro */
+            --color-accento: #90C6BE;       /* Verde claro acento */
+            
+            --color-texto: #333333;
+            --color-fondo: #f8f5f5;         /* Fondo ligeramente cálido */
             --color-tarjeta: #ffffff;
-            --color-borde: #e0e0e0;
-            --color-domingo: #ffebee;
-            --color-hoy: #e3f2fd;
-            --color-evento-multidias: #e8f5e9;
+            --color-borde: #e6d2d5;         /* Borde rojo muy suave */
+            --color-domingo: #fbe9eb;       /* Fondo domingo - rojo muy claro */
+            --color-hoy: #f3e5e6;           /* Fondo hoy - rojo claro */
+            --color-evento-multidias: #e6f0ed; /* Verde muy claro para eventos multidía */
         }
 
         [data-tema="oscuro"] {
-            --color-primario: #6b73ff;
-            --color-secundario: #000dff;
-            --color-texto: #f0f0f0;
-            --color-fondo: #121212;
-            --color-tarjeta: #1e1e1e;
-            --color-borde: #444;
-            --color-domingo: #4a1c1c;
-            --color-hoy: #1a237e;
-            --color-evento-multidias: #1b5e20;
+            /* Modo oscuro - manteniendo la misma paleta pero más oscura */
+            --color-primario: #D64D5A;      /* Rojo más brillante para contraste */
+            --color-secundario: #8C2A55;    /* Burdeo más intenso */
+            --color-terciario: #0B8A5C;     /* Verde más brillante */
+            --color-accento: #9ED6CE;       /* Verde acento más claro */
+            
+            --color-texto: #f0e6e6;
+            --color-fondo: #1a1415;         /* Fondo oscuro con tono rojizo */
+            --color-tarjeta: #251d1f;
+            --color-borde: #4a3a3d;
+            --color-domingo: #3d2629;
+            --color-hoy: #4a2d31;
+            --color-evento-multidias: #24332f;
         }
 
         * {
