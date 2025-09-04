@@ -86,9 +86,18 @@
 
         .calendario {
             display: grid;
-            grid-template-columns: repeat(7, 1fr);
+            grid-template-columns: repeat(7, minmax(100px, 1fr)); /* cada columna mínimo 100px */
             gap: 8px;
             position: relative;
+            overflow-x: auto;   /* habilita scroll horizontal */
+        }
+
+        .calendario::-webkit-scrollbar {
+            height: 8px;
+        }
+        .calendario::-webkit-scrollbar-thumb {
+            background: var(--color-secundario);
+            border-radius: 4px;
         }
 
         .dia-cabecera {
